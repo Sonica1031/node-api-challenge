@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const db = require("../helpers/projectModel");
+const middleware = require("../Middleware/verification");
 const { reset } = require("nodemon");
 
 router.get("/", (req, res, next) => {
@@ -43,8 +44,14 @@ router.delete("/:id", (req, res, next) => {
         })
 })
 
-router.post("/", (req, res, next) => {
+router.post("/", middleware.verifyProject(), (req, res, next) => {
     db.insert(req.body)
+        .then(response =>{
+            res.status(200).json(response)
+        })
+        .catch(error => {
+            next(error)
+        })
 })
 
 module.exports = router;
